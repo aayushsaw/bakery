@@ -116,8 +116,10 @@ if (isset($_SESSION['user_admin_id']) && $_SESSION['user_admin_id'] != null) {
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" href="view_orders.php"><i class="fas fa-shopping-cart
-"></i>Orders</a>
+                                <a class="nav-link active" href="view_orders.php"><i class="fas fa-shopping-cart"></i>Orders</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="moderate_reviews.php"><i class="fas fa-star"></i>Moderate Reviews</a>
                             </li>
                         </ul>
                     </div>
