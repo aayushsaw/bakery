@@ -90,9 +90,34 @@ if ($stmt) {
     mysqli_stmt_bind_param($stmt, "sssss", $users_username, $users_email, $hashed_password, $users_mobile, $users_address);
     
     if (mysqli_stmt_execute($stmt)) {
+        $user_id = mysqli_insert_id($conn);
         mysqli_stmt_close($stmt);
+        
+        // Generate email verification token
+        $verification_token = bin2hex(openssl_random_pseudo_bytes(32));
+        $verification_link = 'http://localhost/bakery/verify_email.php?token=' . $verification_token;
+        
+        // Update user with verification token
+        $update_query = "UPDATE cake_shop_users_registrations SET email_verification_token = ? WHERE users_id = ?";
+        $update_stmt = mysqli_prepare($conn, $update_query);
+        if ($update_stmt) {
+            mysqli_stmt_bind_param($update_stmt, "si", $verification_token, $user_id);
+            mysqli_stmt_execute($update_stmt);
+            mysqli_stmt_close($update_stmt);
+        }
+        
+        // Send verification email
+        require_once('includes/email_config.php');
+        require_once('includes/email_templates.php');
+        send_email(
+            $users_email,
+            $users_username,
+            'Verify Your Email - Bakery Shop',
+            email_template_verification($users_username, $verification_link)
+        );
+        
         log_security_event('USER_REGISTERED', "New user registered: $users_username");
-        redirect_with_message('login_users.php', 'success', 'Registration successful! Please login.');
+        redirect_with_message('login_users.php', 'success', 'Registration successful! Please check your email to verify your account.');
     } else {
         mysqli_stmt_close($stmt);
         log_security_event('REGISTRATION_ERROR', "Database error during registration for: $users_username");

@@ -5,7 +5,7 @@
  */
 
 // Email configuration constants
-define('MAIL_FROM_EMAIL', 'noreply@bakeryshop.com');
+define('MAIL_FROM_EMAIL', 'bakeryshop@localhost.com');
 define('MAIL_FROM_NAME', 'Bakery Shop');
 
 // Application URL
