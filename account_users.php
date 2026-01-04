@@ -186,12 +186,14 @@ if (!empty($_SESSION['user_users_id']) && !empty($_SESSION['user_users_username'
                                                 <th>Delivery date</th>
                                                 <th>Payment method</th>
                                                 <th>Total amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             require_once('config.php');
-                                            $select = "SELECT * FROM cake_shop_orders where users_id = $users_id";
+                                            $select = "SELECT * FROM cake_shop_orders where users_id = $users_id ORDER BY created_at DESC";
                                             $query = mysqli_query($conn, $select);
                                             $i = 1;
                                             while ($res = mysqli_fetch_assoc($query)) {
@@ -202,16 +204,30 @@ if (!empty($_SESSION['user_users_id']) && !empty($_SESSION['user_users_username'
                                                 <td><?php echo $res['delivery_date'];?></td>
                                                 <td><?php echo $res['payment_method'];?></td>
                                                 <td>Rs. <?php echo $res['total_amount'];?></td>
+                                                <td>
+                                                    <span class="badge badge-<?php 
+                                                        echo ($res['order_status'] == 'Delivered') ? 'success' : 
+                                                             (($res['order_status'] == 'Cancelled') ? 'danger' : 
+                                                             (($res['order_status'] == 'Shipped') ? 'info' : 'warning')); 
+                                                    ?>">
+                                                        <?php echo isset($res['order_status']) ? $res['order_status'] : 'Pending'; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="track_order.php?order_id=<?php echo $res['orders_id'];?>" class="btn btn-sm btn-primary">Track</a>
+                                                </td>
                                             </tr>
                                             <?php } ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <th>S. No.</th>
-                                                <th>Users id</th>
+                                                <th>Orders id</th>
                                                 <th>Delivery date</th>
                                                 <th>Payment method</th>
                                                 <th>Total amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </tfoot>
                                     </table>

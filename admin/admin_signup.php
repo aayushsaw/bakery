@@ -1,6 +1,9 @@
 <?php
+require_once('../includes/security.php');
+init_secure_session();
+
 if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
-    echo "<script>alert('Username already assigned!!!')</script>";
+    echo "<script>alert('Username already assigned!')</script>";
     echo "<script>window.location.assign('admin_signup.php')</script>";
 }
 ?>
@@ -60,6 +63,7 @@ if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
                 <div class="form-group">
                     <input class="form-control form-control-lg" data-parsley-equalto="#pass1" required="" placeholder="Confirm">
                 </div>
+                <?php echo csrf_token_field(); ?>
                 <div class="form-group pt-2">
                     <button class="btn btn-block btn-primary" type="submit">Register</button>
                 </div>

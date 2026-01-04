@@ -129,18 +129,11 @@ else {
                                 </p>
                                 <h3 class="text-secondary font-italic mt-3 text-left">Email:</h3>
                                 <p class="text-secondary font-italic text-left">
-                                     abc@gmail.com
+                                     aayushsaw13@gmail.com
                                 </p>
                                 <h3 class="text-secondary font-italic mt-3 text-left">Call on:</h3>
                                 <p class="text-secondary font-italic text-left">
-                                     Mr. Aaysh Saw <br>
-
-						 Mr. Manthan  <br>
-
-						 Mr. Om<br>
-                                     
-                                     Mr. Shubham<br>
-
+                                     +91 9322480618<br>
                                 </p>
                     		</div>
                     	</div>
@@ -155,7 +148,7 @@ else {
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                            Created By - Gajanan, Aayush, Manthan, Om, Shubham <a href="https://colorlib.com/wp/"></a>.
+                            Created By - Aayush Saw<a href="https://colorlib.com/wp/"></a>.
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                             <div class="text-md-right footer-links d-none d-sm-block">

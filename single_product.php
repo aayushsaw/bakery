@@ -204,6 +204,125 @@ else {
                 </div>
 
             </div>
+            
+            <!-- Reviews Section -->
+            <div class="container-fluid dashboard-content mt-5">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Customer Reviews</h3>
+                        <hr>
+                        
+                        <?php
+                        // Display existing reviews
+                        $review_query = "SELECT r.*, u.users_username 
+                                        FROM cake_shop_reviews r 
+                                        JOIN cake_shop_users_registrations u ON r.user_id = u.users_id 
+                                        WHERE r.product_id = ? AND r.approved = 1 
+                                        ORDER BY r.created_at DESC";
+                        $review_stmt = mysqli_prepare($conn, $review_query);
+                        if ($review_stmt) {
+                            mysqli_stmt_bind_param($review_stmt, "i", $product_id);
+                            mysqli_stmt_execute($review_stmt);
+                            $reviews = mysqli_stmt_get_result($review_stmt);
+                            
+                            if (mysqli_num_rows($reviews) > 0) {
+                                while ($review = mysqli_fetch_assoc($reviews)) {
+                        ?>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($review['users_username']); ?></h5>
+                                    <span class="text-warning">
+                                        <?php echo str_repeat('⭐', $review['rating']); ?>
+                                    </span>
+                                </div>
+                                <?php if (!empty($review['review_title'])): ?>
+                                    <h6 class="card-subtitle mb-2 text-muted"><?php echo htmlspecialchars($review['review_title']); ?></h6>
+                                <?php endif; ?>
+                                <p class="card-text"><?php echo htmlspecialchars($review['review_text']); ?></p>
+                                <small class="text-muted">Posted on <?php echo date('M d, Y', strtotime($review['created_at'])); ?></small>
+                            </div>
+                        </div>
+                        <?php
+                                }
+                            } else {
+                                echo '<p class="text-muted">No reviews yet. Be the first to review this product!</p>';
+                            }
+                            mysqli_stmt_close($review_stmt);
+                        }
+                        ?>
+                        
+                        <!-- Review Form -->
+                        <?php if (isset($_SESSION['user_users_id'])): ?>
+                            <?php
+                            // Check if user already reviewed
+                            $check_query = "SELECT review_id FROM cake_shop_reviews WHERE user_id = ? AND product_id = ?";
+                            $check_stmt = mysqli_prepare($conn, $check_query);
+                            $already_reviewed = false;
+                            if ($check_stmt) {
+                                mysqli_stmt_bind_param($check_stmt, "ii", $_SESSION['user_users_id'], $product_id);
+                                mysqli_stmt_execute($check_stmt);
+                                mysqli_stmt_store_result($check_stmt);
+                                $already_reviewed = (mysqli_stmt_num_rows($check_stmt) > 0);
+                                mysqli_stmt_close($check_stmt);
+                            }
+                            ?>
+                            
+                            <?php if (!$already_reviewed): ?>
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5>Write a Review</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="submit_review.php" method="POST">
+                                        <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                                        <?php 
+                                        require_once('includes/security.php');
+                                        echo csrf_token_field(); 
+                                        ?>
+                                        
+                                        <div class="form-group">
+                                            <label>Rating <span class="text-danger">*</span></label>
+                                            <select name="rating" class="form-control" required>
+                                                <option value="">Select Rating</option>
+                                                <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                                <option value="4">⭐⭐⭐⭐ Good</option>
+                                                <option value="3">⭐⭐⭐ Average</option>
+                                                <option value="2">⭐⭐ Poor</option>
+                                                <option value="1">⭐ Terrible</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Review Title (Optional)</label>
+                                            <input type="text" name="review_title" class="form-control" placeholder="e.g., Best cake ever!" maxlength="200">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Your Review <span class="text-danger">*</span></label>
+                                            <textarea name="review_text" class="form-control" rows="4" required placeholder="Share your experience with this product..."></textarea>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <?php else: ?>
+                            <div class="alert alert-info mt-4">
+                                You have already reviewed this product. Thank you for your feedback!
+                            </div>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <div class="alert alert-warning mt-4">
+                                Please <a href="login_users.php">login</a> to write a review.
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <!-- End Reviews Section -->
+
+            
             <!-- ============================================================== -->
             <!-- footer -->
             <!-- ============================================================== -->
@@ -211,7 +330,7 @@ else {
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                           Created By - Aayush,Manthan,Shubham,Om<a href="https://colorlib.com/wp/"></a>.
+                           Created By - Aayush Saw<a href="https://colorlib.com/wp/"></a>.
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                             <div class="text-md-right footer-links d-none d-sm-block">
