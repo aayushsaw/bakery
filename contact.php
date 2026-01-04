@@ -129,11 +129,11 @@ else {
                                 </p>
                                 <h3 class="text-secondary font-italic mt-3 text-left">Email:</h3>
                                 <p class="text-secondary font-italic text-left">
-                                     abc@gmail.com
+                                     aayushsaw13@gmail.com
                                 </p>
                                 <h3 class="text-secondary font-italic mt-3 text-left">Call on:</h3>
                                 <p class="text-secondary font-italic text-left">
-                                     Mr. Aayush Saw<br>
+                                     +91 9322480618<br>
                                 </p>
                     		</div>
                     	</div>
