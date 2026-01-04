@@ -124,7 +124,12 @@ else {
 
                     <?php
                     require_once('config.php');
-                    $select = "SELECT * FROM cake_shop_product where product_category = ".$_GET['category'];
+                    if (isset($_GET['category']) && !empty($_GET['category'])) {
+                        $category_id = (int)$_GET['category'];
+                        $select = "SELECT * FROM cake_shop_product WHERE category_id = $category_id";
+                    } else {
+                        $select = "SELECT * FROM cake_shop_product";
+                    }
                     $query = mysqli_query($conn, $select);
                     while ($res = mysqli_fetch_assoc($query)) {
                     ?>
