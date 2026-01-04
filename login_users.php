@@ -1,4 +1,7 @@
 <?php
+require_once('includes/security.php');
+init_secure_session();
+
 if (isset($_GET['login_error']) && $_GET['login_error'] == 1) {
     echo "<script>alert('Username or Password does not exist!')</script>";
     echo "<script>window.location.assign('login.php')</script>";
@@ -49,6 +52,7 @@ if (isset($_GET['login_error']) && $_GET['login_error'] == 1) {
                     <div class="form-group">
                         <input class="form-control form-control-lg" id="pass1" type="password" required="" placeholder="Password" name="users_password">
                     </div>
+                    <?php echo csrf_token_field(); ?>
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
                 </form>
             </div>
