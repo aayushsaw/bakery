@@ -4,7 +4,7 @@
  * Uses password hashing, prepared statements, and input validation
  */
 
-require_once('config.php');
+require_once('config_secure.php');
 require_once('includes/security.php');
 
 // Initialize secure session

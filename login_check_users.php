@@ -4,7 +4,7 @@
  * Uses password verification, prepared statements, rate limiting, and session security
  */
 
-require_once('config.php');
+require_once('config_secure.php');
 require_once('includes/security.php');
 
 // Initialize secure session

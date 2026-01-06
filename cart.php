@@ -63,7 +63,7 @@ else {
                             <a class="nav-link" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
@@ -156,7 +156,7 @@ else {
                     						<?php } else { ?>
                     						<?php
                                             $total_amount = 0;
-                    						require_once('config.php');
+                    						require_once('config_secure.php');
                     						for ($i=0; $i < count($_SESSION['cart']); $i++) { 
                     							$select = "SELECT * FROM cake_shop_product where product_id = {$_SESSION['cart'][$i]}";
                     							$query = mysqli_query($conn, $select);

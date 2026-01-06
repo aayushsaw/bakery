@@ -4,7 +4,7 @@
  * Displays search results with filters
  */
 
-require_once('config.php');
+require_once('config_secure.php');
 require_once('includes/security.php');
 
 init_secure_session();
