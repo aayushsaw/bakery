@@ -1,6 +1,5 @@
 <?php
-require_once('includes/security.php');
-init_secure_session();
+session_start();
 
 if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
     echo "<script>alert('Username already assigned!!!')</script>";
@@ -69,7 +68,6 @@ if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
                 <div class="form-group">
                     <input class="form-control form-control-lg" type="text" name="users_address" data-parsley-trigger="change" required="" placeholder="Address" autocomplete="off">
                 </div>
-                <?php echo csrf_token_field(); ?>
                 <div class="form-group pt-2">
                     <button class="btn btn-block btn-primary" type="submit">Register</button>
                 </div>
