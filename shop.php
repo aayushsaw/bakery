@@ -123,15 +123,16 @@ else {
                 <div class="row mx-5">
 
                     <?php
-                    require_once('config.php');
+                    require_once('config_secure.php');
                     if (isset($_GET['category']) && !empty($_GET['category'])) {
                         $category_id = (int)$_GET['category'];
-                        $select = "SELECT * FROM cake_shop_product WHERE category_id = $category_id";
+                        $select = "SELECT * FROM cake_shop_product WHERE product_category = $category_id";
                     } else {
                         $select = "SELECT * FROM cake_shop_product";
                     }
                     $query = mysqli_query($conn, $select);
-                    while ($res = mysqli_fetch_assoc($query)) {
+                    if ($query) {
+                        while ($res = mysqli_fetch_assoc($query)) {
                     ?>
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                         <div class="product-thumbnail rounded">
@@ -156,7 +157,10 @@ else {
                             </div>
                         </div>
                     </div>
-                    <?php } ?>
+                    <?php 
+                        } // end while
+                    } // end if query
+                    ?>
 
                 </div>
 
@@ -167,7 +171,7 @@ else {
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="owl-carousel owl-theme">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
