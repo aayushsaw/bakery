@@ -245,6 +245,11 @@ else {
             }, 2000);
         }
         function add_cart(product_id) {
+                // Prevent multiple clicks
+                var btn = event.target;
+                if(btn.disabled) return;
+                btn.disabled = true;
+                
                 $.ajax({
                     url:'fetch_cart.php',
                     data:'id='+product_id,
@@ -254,9 +259,11 @@ else {
                         console.log(cart);
                         $('.badge').html(cart.length);
                         showToast('✓ Product added to cart!');
+                        btn.disabled = false;
                     },
                     error:function(){
                         showToast('✗ Error adding to cart', 'error');
+                        btn.disabled = false;
                     }
                 });
             }
