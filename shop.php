@@ -243,6 +243,10 @@ else {
                     success:function(cart){
                         console.log(cart);
                         $('.badge').html(cart.length);
+                        alert('Product added to cart successfully!');
+                    },
+                    error:function(){
+                        alert('Error adding product to cart. Please try again.');
                     }
                 });
             }
