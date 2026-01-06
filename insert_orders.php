@@ -1,5 +1,5 @@
 <?php
-require_once('config.php');
+require_once('config_secure.php');
 session_start();
 if (isset($_SESSION['cart']) && $_SESSION['cart'] !== null) {
 if (isset($_SESSION['user_users_id']) && $_SESSION['user_users_username'] !== null) {
