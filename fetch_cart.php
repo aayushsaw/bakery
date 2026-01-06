@@ -1,8 +1,21 @@
 <?php
 session_start();
-// Initialize cart with quantities if it doesn't exist
+
+// Initialize cart if it doesn't exist
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
+}
+
+// Convert old format to new format if needed
+if (!empty($_SESSION['cart']) && !is_array(reset($_SESSION['cart']))) {
+    // Old format detected: ["1", "2", "3"]
+    // Convert to new format: [{"id": "1", "quantity": 1}, ...]
+    $old_cart = $_SESSION['cart'];
+    $_SESSION['cart'] = array();
+    $counts = array_count_values($old_cart);
+    foreach($counts as $id => $quantity) {
+        $_SESSION['cart'][] = array('id' => $id, 'quantity' => $quantity);
+    }
 }
 
 if(isset($_GET['id'])){

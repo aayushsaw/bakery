@@ -25,6 +25,7 @@ else {
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link href="fonts/circular-std/style.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/userpage.css">
     <link rel="stylesheet" href="fonts/fontawesome/css/fontawesome-all.css">
     <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
