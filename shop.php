@@ -55,7 +55,7 @@ else {
                             <a class="nav-link active" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
