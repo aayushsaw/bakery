@@ -170,8 +170,8 @@ else {
                     							<td><?php echo ++$j;?></td>
                     							<td><?php echo $res['product_name'];?><input type="hidden" name="hidden_product_name[]" value="<?php echo $res['product_name'];?>"></td>
                     							<td>Rs. <?php echo $res['product_price'];?><input type="hidden" name="hidden_product_price[]" value="<?php echo $res['product_price'];?>"></td>
-                    							<td><input class="form-control" type="number" min="1" max="9" step="1" value="1" name="product_quantity[]" onchange="prodTotal(this)"></td>
-                    							<td><span>Rs. <?php echo $res['product_price'] * 1;?></span><input type="hidden" name="hidden_product_total[]" value="<?php echo $res['product_price'];?>"></td>
+                    							<td><input class="form-control" type="number" min="1" max="9" step="1" value="<?php echo $product_qty;?>" name="product_quantity[]" onchange="prodTotal(this)"></td>
+                    							<td><span>Rs. <?php echo $res['product_price'] * $product_qty;?></span><input type="hidden" name="hidden_product_total[]" value="<?php echo $res['product_price'] * $product_qty;?>"></td>
                     							<td align="center"><a href="remove_product.php?val_i=<?php echo $i;?>"><i class="fas fa-trash-alt"></i></a></td>
                     						</tr>
                     					    <?php } ?>
