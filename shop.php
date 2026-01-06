@@ -234,6 +234,15 @@ else {
                 }
             })
         });
+        function showToast(message, type = 'success') {
+            const toast = $('<div class="toast-notification ' + type + '">' + message + '</div>');
+            $('body').append(toast);
+            setTimeout(() => toast.addClass('show'), 100);
+            setTimeout(() => {
+                toast.removeClass('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
         function add_cart(product_id) {
                 $.ajax({
                     url:'fetch_cart.php',
@@ -243,10 +252,10 @@ else {
                     success:function(cart){
                         console.log(cart);
                         $('.badge').html(cart.length);
-                        alert('Product added to cart successfully!');
+                        showToast('✓ Product added to cart!');
                     },
                     error:function(){
-                        alert('Error adding product to cart. Please try again.');
+                        showToast('✗ Error adding to cart', 'error');
                     }
                 });
             }

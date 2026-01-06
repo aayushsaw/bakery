@@ -158,11 +158,13 @@ else {
                                             $total_amount = 0;
                     						require_once('config_secure.php');
                     						for ($i=0; $i < count($_SESSION['cart']); $i++) { 
-                    							$select = "SELECT * FROM cake_shop_product where product_id = {$_SESSION['cart'][$i]}";
+                    							$product_id = $_SESSION['cart'][$i]['id'];
+                    							$product_qty = $_SESSION['cart'][$i]['quantity'];
+                    							$select = "SELECT * FROM cake_shop_product where product_id = $product_id";
                     							$query = mysqli_query($conn, $select);
                     							$j = $i;
                     							while ($res = mysqli_fetch_assoc($query)) { 
-                                                $total_amount = $total_amount + $res['product_price'];
+                                                $total_amount = $total_amount + ($res['product_price'] * $product_qty);
                     						?>
                     						<tr>
                     							<td><?php echo ++$j;?></td>
