@@ -1,23 +1,35 @@
 <?php
-require_once('../config.php');
-$category_name = $_POST['category_name'];
-$file_name = $_FILES['category_image']['name'];
-if ($file_name != "") {
-	$f_name = Date('ymdhis');
-    $file_array = explode('.', $file_name);
-    $ext = $file_array[count($file_array) - 1];
-    $new_file_name = $f_name.'.'.$ext;
-    $destination = "../uploads/".$new_file_name;
-    $source = $_FILES['category_image']['tmp_name'];
-    move_uploaded_file($source, $destination);
-    $insert = "INSERT INTO cake_shop_category (category_name, category_image) values ('$category_name', '$new_file_name')";
-    mysqli_query($conn, $insert);
-    header('Location: add_category.php?add_msg=1');
+session_start();
+require_once('../config_secure.php');
+
+// Check if admin is logged in
+if (!isset($_SESSION['user_admin_id'])) {
+    header("Location: index.php");
+    exit();
 }
-elseif ($file_name == "") {
-	$default = "default-image.jpg";
-	$insert = "INSERT INTO cake_shop_category (category_name, category_image) values ('$category_name', '$default')";
-	mysqli_query($conn, $insert);
-    header('Location: add_category.php?add_msg=1');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $category_name = trim($_POST['category_name']);
+    
+    if (!empty($category_name)) {
+        $query = "INSERT INTO cake_shop_category (category_name) VALUES (?)";
+        $stmt = mysqli_prepare($conn, $query);
+        
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $category_name);
+            
+            if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_close($stmt);
+                header("Location: view_category.php?success=1");
+                exit();
+            }
+        }
+    }
+    
+    header("Location: add_category.php?error=1");
+    exit();
 }
+
+header("Location: add_category.php");
+exit();
 ?>
