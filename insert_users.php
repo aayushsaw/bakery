@@ -62,7 +62,7 @@ if ($insert_stmt) {
     mysqli_stmt_bind_param($insert_stmt, "sss", $username, $email, $hashed_password);
     
     if (mysqli_stmt_execute($insert_stmt)) {
-        mysqli_stmt_close($stmt);
+        mysqli_stmt_close($insert_stmt);
         header("Location: login_users.php?register_success=1");
         exit();
     }
