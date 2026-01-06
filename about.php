@@ -55,7 +55,7 @@ else {
                             <a class="nav-link" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
@@ -156,7 +156,7 @@ else {
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="owl-carousel owl-theme">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
