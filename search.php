@@ -80,7 +80,12 @@ $categories = mysqli_query($conn, $cat_query);
                 <?php while ($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="uploads/<?php echo $product['product_image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['product_name']); ?>">
+                            <?php
+                            // Handle multiple images - use only first one
+                            $images = explode(', ', $product['product_image']);
+                            $first_image = trim($images[0]);
+                            ?>
+                            <img src="uploads/<?php echo htmlspecialchars($first_image); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['product_name']); ?>" style="max-height: 200px; object-fit: cover;">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($product['product_name']); ?></h5>
                                 <p class="card-text">₹<?php echo number_format($product['product_price'], 2); ?></p>
