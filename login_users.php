@@ -1,10 +1,13 @@
 <?php
-require_once('includes/security.php');
-init_secure_session();
+session_start();
 
 if (isset($_GET['login_error']) && $_GET['login_error'] == 1) {
     echo "<script>alert('Username or Password does not exist!')</script>";
-    echo "<script>window.location.assign('login.php')</script>";
+    echo "<script>window.location.assign('login_users.php')</script>";
+}
+if (isset($_GET['register_success']) && $_GET['register_success'] == 1) {
+    echo "<script>alert('Registration successful! Please login.')</script>";
+    echo "<script>window.location.assign('login_users.php')</script>";
 }
 ?>
 <!doctype html>
@@ -45,15 +48,13 @@ if (isset($_GET['login_error']) && $_GET['login_error'] == 1) {
         <div class="card ">
             <div class="card-header text-center"><a href="#"><h2 class="text-primary">Online Cake Shop</h2></a><span class="splash-description">Please enter your user information.</span></div>
             <div class="card-body">
-                <?php display_flash_message(); ?>
                 <form id="form" data-parsley-validate="" method="post" action="login_check_users.php">
                     <div class="form-group">
-                        <input class="form-control form-control-lg" type="text" name="users_username" data-parsley-trigger="change" required="" placeholder="Username" autocomplete="off">
+                        <input class="form-control form-control-lg" type="text" name="username" data-parsley-trigger="change" required="" placeholder="Username" autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <input class="form-control form-control-lg" id="pass1" type="password" required="" placeholder="Password" name="users_password">
+                        <input class="form-control form-control-lg" id="pass1" type="password" required="" placeholder="Password" name="password">
                     </div>
-                    <?php echo csrf_token_field(); ?>
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
                 </form>
             </div>
