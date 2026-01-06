@@ -1,16 +1,13 @@
 <?php
 /**
- * Product Search Page
- * Displays search results with filters
+ * Product Search Page - Simplified for InfinityFree
  */
 
+session_start();
 require_once('config_secure.php');
-require_once('includes/security.php');
 
-init_secure_session();
-
-$search_query = isset($_GET['q']) ? sanitize_input($_GET['q']) : '';
-$category_filter = isset($_GET['category']) ? sanitize_input($_GET['category']) : '';
+$search_query = isset($_GET['q']) ? trim($_GET['q']) : '';
+$category_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
 $min_price = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
 $max_price = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 10000;
 
@@ -18,36 +15,20 @@ $max_price = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 10000;
 $sql = "SELECT p.*, c.category_name FROM cake_shop_product p 
         LEFT JOIN cake_shop_category c ON p.product_category = c.category_id 
         WHERE 1=1";
-$params = array();
-$types = "";
 
 if (!empty($search_query)) {
-    $sql .= " AND (p.product_name LIKE ? OR p.product_description LIKE ?)";
-    $search_term = "%$search_query%";
-    $params[] = $search_term;
-    $params[] = $search_term;
-    $types .= "ss";
+    $search_term = "%" . mysqli_real_escape_string($conn, $search_query) . "%";
+    $sql .= " AND (p.product_name LIKE '$search_term' OR p.product_description LIKE '$search_term')";
 }
 
-if (!empty($category_filter)) {
-    $sql .= " AND p.product_category = ?";
-    $params[] = $category_filter;
-    $types .= "i";
+if ($category_filter > 0) {
+    $sql .= " AND p.product_category = $category_filter";
 }
 
-$sql .= " AND p.product_price BETWEEN ? AND ?";
-$params[] = $min_price;
-$params[] = $max_price;
-$types .= "ii";
-
+$sql .= " AND p.product_price BETWEEN $min_price AND $max_price";
 $sql .= " ORDER BY p.product_name ASC";
 
-$stmt = mysqli_prepare($conn, $sql);
-if (!empty($params)) {
-    mysqli_stmt_bind_param($stmt, $types, ...$params);
-}
-mysqli_stmt_execute($stmt);
-$products = mysqli_stmt_get_result($stmt);
+$products = mysqli_query($conn, $sql);
 
 // Get categories for filter
 $cat_query = "SELECT * FROM cake_shop_category";
@@ -64,10 +45,8 @@ $categories = mysqli_query($conn, $cat_query);
     <link rel="stylesheet" href="fonts/fontawesome/css/fontawesome-all.css">
 </head>
 <body>
-    <!-- Navigation (copy from index.php) -->
-    
     <div class="container mt-5">
-        <h2>Search Results for "<?php echo htmlspecialchars($search_query); ?>"</h2>
+        <h2>Search Results<?php if($search_query) echo ' for "' . htmlspecialchars($search_query) . '"'; ?></h2>
         
         <!-- Filters -->
         <div class="row mb-4">
@@ -77,7 +56,10 @@ $categories = mysqli_query($conn, $cat_query);
                     
                     <select name="category" class="form-control mr-2">
                         <option value="">All Categories</option>
-                        <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
+                        <?php 
+                        mysqli_data_seek($categories, 0);
+                        while ($cat = mysqli_fetch_assoc($categories)): 
+                        ?>
                             <option value="<?php echo $cat['category_id']; ?>" <?php echo ($category_filter == $cat['category_id']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($cat['category_name']); ?>
                             </option>
@@ -94,11 +76,11 @@ $categories = mysqli_query($conn, $cat_query);
         
         <!-- Results -->
         <div class="row">
-            <?php if (mysqli_num_rows($products) > 0): ?>
+            <?php if ($products && mysqli_num_rows($products) > 0): ?>
                 <?php while ($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="uploads/<?php echo $product['product_image1']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['product_name']); ?>">
+                            <img src="uploads/<?php echo $product['product_image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['product_name']); ?>">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($product['product_name']); ?></h5>
                                 <p class="card-text">₹<?php echo number_format($product['product_price'], 2); ?></p>
@@ -117,8 +99,6 @@ $categories = mysqli_query($conn, $cat_query);
             <?php endif; ?>
         </div>
     </div>
-    
-    <!-- Footer (copy from index.php) -->
     
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/bootstrap.bundle.js"></script>
