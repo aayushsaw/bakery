@@ -1,14 +1,10 @@
 <?php
 /**
- * User Registration Handler - Secure Version
- * Uses password hashing, prepared statements, and input validation
+ * User Registration Handler - Simplified for InfinityFree
  */
 
-require_once('config.php');
-require_once('includes/security.php');
-
-// Initialize secure session
-init_secure_session();
+session_start();
+require_once('config_secure.php');
 
 // Check if form was submitted
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -16,119 +12,65 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Validate CSRF token
-if (!isset($_POST['csrf_token']) || !validate_csrf_token($_POST['csrf_token'])) {
-    log_security_event('CSRF_VALIDATION_FAILED', 'User registration attempt with invalid CSRF token');
-    header("Location: register.php?error=invalid_request");
+// Get and validate inputs
+$username = isset($_POST['username']) ? trim($_POST['username']) : '';
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
+$password = isset($_POST['password']) ? $_POST['password'] : '';
+$confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
+
+// Basic validation
+if (empty($username) || empty($email) || empty($password)) {
+    header("Location: register.php?error=empty_fields");
     exit();
 }
 
-// Sanitize and validate inputs
-$users_username = sanitize_input(isset($_POST['users_username']) ? $_POST['users_username'] : '');
-$users_email = sanitize_input(isset($_POST['users_email']) ? $_POST['users_email'] : '');
-$users_password = isset($_POST['users_password']) ? $_POST['users_password'] : ''; // Don't sanitize password
-$users_mobile = sanitize_input(isset($_POST['users_mobile']) ? $_POST['users_mobile'] : '');
-$users_address = sanitize_input(isset($_POST['users_address']) ? $_POST['users_address'] : '');
-
-// Validation
-$errors = [];
-
-if (empty($users_username) || strlen($users_username) < 3) {
-    $errors[] = "Username must be at least 3 characters long";
-}
-
-if (!validate_email($users_email)) {
-    $errors[] = "Invalid email address";
-}
-
-if (empty($users_password) || strlen($users_password) < 6) {
-    $errors[] = "Password must be at least 6 characters long";
-}
-
-if (!validate_phone($users_mobile)) {
-    $errors[] = "Invalid phone number (must be 10 digits)";
-}
-
-if (empty($users_address)) {
-    $errors[] = "Address is required";
-}
-
-// If there are validation errors, redirect back
-if (!empty($errors)) {
-    $_SESSION['registration_errors'] = $errors;
-    header("Location: register.php?error=validation");
+if ($password !== $confirm_password) {
+    header("Location: register.php?error=password_mismatch");
     exit();
 }
 
-// Check if username or email already exists using prepared statement
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header("Location: register.php?error=invalid_email");
+    exit();
+}
+
+// Check if username or email already exists
 $check_query = "SELECT users_id FROM cake_shop_users_registrations WHERE users_username = ? OR users_email = ?";
-$stmt = mysqli_prepare($conn, $check_query);
+$check_stmt = mysqli_prepare($conn, $check_query);
 
-if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "ss", $users_username, $users_email);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_store_result($stmt);
+if ($check_stmt) {
+    mysqli_stmt_bind_param($check_stmt, "ss", $username, $email);
+    mysqli_stmt_execute($check_stmt);
+    $check_result = mysqli_stmt_get_result($check_stmt);
     
-    if (mysqli_stmt_num_rows($stmt) > 0) {
-        mysqli_stmt_close($stmt);
-        log_security_event('REGISTRATION_DUPLICATE', "Attempted registration with existing username/email: $users_username");
-        header("Location: register.php?register_msg=1");
+    if (mysqli_num_rows($check_result) > 0) {
+        mysqli_stmt_close($check_stmt);
+        header("Location: register.php?error=user_exists");
+        exit();
+    }
+    mysqli_stmt_close($check_stmt);
+}
+
+// Hash password
+$hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+// Insert new user
+$insert_query = "INSERT INTO cake_shop_users_registrations (users_username, users_email, users_password, email_verified) VALUES (?, ?, ?, 1)";
+$insert_stmt = mysqli_prepare($conn, $insert_query);
+
+if ($insert_stmt) {
+    mysqli_stmt_bind_param($insert_stmt, "sss", $username, $email, $hashed_password);
+    
+    if (mysqli_stmt_execute($insert_stmt)) {
+        mysqli_stmt_close($insert_stmt);
+        header("Location: login_users.php?register_success=1");
         exit();
     }
     
-    mysqli_stmt_close($stmt);
+    mysqli_stmt_close($insert_stmt);
 }
 
-// Hash the password
-$hashed_password = hash_password($users_password);
-
-// Insert new user using prepared statement
-$insert_query = "INSERT INTO cake_shop_users_registrations (users_username, users_email, users_password, users_mobile, users_address) VALUES (?, ?, ?, ?, ?)";
-$stmt = mysqli_prepare($conn, $insert_query);
-
-if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "sssss", $users_username, $users_email, $hashed_password, $users_mobile, $users_address);
-    
-    if (mysqli_stmt_execute($stmt)) {
-        $user_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-        
-        // Generate email verification token
-        $verification_token = bin2hex(openssl_random_pseudo_bytes(32));
-        $verification_link = 'http://localhost/bakery/verify_email.php?token=' . $verification_token;
-        
-        // Update user with verification token
-        $update_query = "UPDATE cake_shop_users_registrations SET email_verification_token = ? WHERE users_id = ?";
-        $update_stmt = mysqli_prepare($conn, $update_query);
-        if ($update_stmt) {
-            mysqli_stmt_bind_param($update_stmt, "si", $verification_token, $user_id);
-            mysqli_stmt_execute($update_stmt);
-            mysqli_stmt_close($update_stmt);
-        }
-        
-        // Send verification email
-        require_once('includes/email_config.php');
-        require_once('includes/email_templates.php');
-        send_email(
-            $users_email,
-            $users_username,
-            'Verify Your Email - Bakery Shop',
-            email_template_verification($users_username, $verification_link)
-        );
-        
-        log_security_event('USER_REGISTERED', "New user registered: $users_username");
-        redirect_with_message('login_users.php', 'success', 'Registration successful! Please check your email to verify your account.');
-    } else {
-        mysqli_stmt_close($stmt);
-        log_security_event('REGISTRATION_ERROR', "Database error during registration for: $users_username");
-        header("Location: register.php?error=database");
-        exit();
-    }
-} else {
-    log_security_event('REGISTRATION_ERROR', "Failed to prepare statement for registration");
-    header("Location: register.php?error=database");
-    exit();
-}
-
-mysqli_close($conn);
+// Registration failed
+header("Location: register.php?error=registration_failed");
+exit();
 ?>

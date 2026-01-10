@@ -1,6 +1,5 @@
 <?php
-require_once('includes/security.php');
-init_secure_session();
+session_start();
 
 if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
     echo "<script>alert('Username already assigned!!!')</script>";
@@ -52,24 +51,23 @@ if (isset($_GET['register_msg']) && $_GET['register_msg'] == 1) {
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <input class="form-control form-control-lg" type="text" name="users_username" data-parsley-trigger="change" required="" placeholder="Username" autocomplete="off">
+                    <input class="form-control form-control-lg" type="text" name="username" data-parsley-trigger="change" required="" placeholder="Username" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input class="form-control form-control-lg" type="email" name="users_email" data-parsley-trigger="change" required="" placeholder="E-mail" autocomplete="off">
+                    <input class="form-control form-control-lg" type="email" name="email" data-parsley-trigger="change" required="" placeholder="E-mail" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input class="form-control form-control-lg" id="pass1" type="password" required="" placeholder="Password" name="users_password">
+                    <input class="form-control form-control-lg" id="pass1" type="password" required="" placeholder="Password" name="password">
                 </div>
                 <div class="form-group">
-                    <input class="form-control form-control-lg" data-parsley-equalto="#pass1" type="password" required="" placeholder="Confirm password">
+                    <input class="form-control form-control-lg" data-parsley-equalto="#pass1" type="password" required="" placeholder="Confirm password" name="confirm_password">
                 </div>
                 <div class="form-group">
-                    <input class="form-control form-control-lg" type="tel" name="users_mobile" data-parsley-trigger="change" required="" placeholder="Mobile no." pattern="[0-9]{10}" autocomplete="off">
+                    <input class="form-control form-control-lg" type="tel" name="mobile" data-parsley-trigger="change" required="" placeholder="Mobile no." pattern="[0-9]{10}" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input class="form-control form-control-lg" type="text" name="users_address" data-parsley-trigger="change" required="" placeholder="Address" autocomplete="off">
+                    <input class="form-control form-control-lg" type="text" name="address" data-parsley-trigger="change" required="" placeholder="Address" autocomplete="off">
                 </div>
-                <?php echo csrf_token_field(); ?>
                 <div class="form-group pt-2">
                     <button class="btn btn-block btn-primary" type="submit">Register</button>
                 </div>

@@ -63,7 +63,7 @@ else {
                             <a class="nav-link" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
@@ -156,20 +156,22 @@ else {
                     						<?php } else { ?>
                     						<?php
                                             $total_amount = 0;
-                    						require_once('config.php');
+                    						require_once('config_secure.php');
                     						for ($i=0; $i < count($_SESSION['cart']); $i++) { 
-                    							$select = "SELECT * FROM cake_shop_product where product_id = {$_SESSION['cart'][$i]}";
+                    							$product_id = $_SESSION['cart'][$i]['id'];
+                    							$product_qty = $_SESSION['cart'][$i]['quantity'];
+                    							$select = "SELECT * FROM cake_shop_product where product_id = $product_id";
                     							$query = mysqli_query($conn, $select);
                     							$j = $i;
                     							while ($res = mysqli_fetch_assoc($query)) { 
-                                                $total_amount = $total_amount + $res['product_price'];
+                                                $total_amount = $total_amount + ($res['product_price'] * $product_qty);
                     						?>
                     						<tr>
                     							<td><?php echo ++$j;?></td>
                     							<td><?php echo $res['product_name'];?><input type="hidden" name="hidden_product_name[]" value="<?php echo $res['product_name'];?>"></td>
                     							<td>Rs. <?php echo $res['product_price'];?><input type="hidden" name="hidden_product_price[]" value="<?php echo $res['product_price'];?>"></td>
-                    							<td><input class="form-control" type="number" min="1" max="9" step="1" value="1" name="product_quantity[]" onchange="prodTotal(this)"></td>
-                    							<td><span>Rs. <?php echo $res['product_price'] * 1;?></span><input type="hidden" name="hidden_product_total[]" value="<?php echo $res['product_price'];?>"></td>
+                    							<td><input class="form-control" type="number" min="1" max="9" step="1" value="<?php echo $product_qty;?>" name="product_quantity[]" onchange="prodTotal(this)"></td>
+                    							<td><span>Rs. <?php echo $res['product_price'] * $product_qty;?></span><input type="hidden" name="hidden_product_total[]" value="<?php echo $res['product_price'] * $product_qty;?>"></td>
                     							<td align="center"><a href="remove_product.php?val_i=<?php echo $i;?>"><i class="fas fa-trash-alt"></i></a></td>
                     						</tr>
                     					    <?php } ?>

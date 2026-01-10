@@ -25,6 +25,7 @@ else {
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link href="fonts/circular-std/style.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/userpage.css">
     <link rel="stylesheet" href="fonts/fontawesome/css/fontawesome-all.css">
     <link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
@@ -55,7 +56,7 @@ else {
                             <a class="nav-link active" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
@@ -123,10 +124,16 @@ else {
                 <div class="row mx-5">
 
                     <?php
-                    require_once('config.php');
-                    $select = "SELECT * FROM cake_shop_product where product_category = ".$_GET['category'];
+                    require_once('config_secure.php');
+                    if (isset($_GET['category']) && !empty($_GET['category'])) {
+                        $category_id = (int)$_GET['category'];
+                        $select = "SELECT * FROM cake_shop_product WHERE product_category = $category_id";
+                    } else {
+                        $select = "SELECT * FROM cake_shop_product";
+                    }
                     $query = mysqli_query($conn, $select);
-                    while ($res = mysqli_fetch_assoc($query)) {
+                    if ($query) {
+                        while ($res = mysqli_fetch_assoc($query)) {
                     ?>
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                         <div class="product-thumbnail rounded">
@@ -151,7 +158,10 @@ else {
                             </div>
                         </div>
                     </div>
-                    <?php } ?>
+                    <?php 
+                        } // end while
+                    } // end if query
+                    ?>
 
                 </div>
 
@@ -162,7 +172,7 @@ else {
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="owl-carousel owl-theme">
                             <?php
-                            require_once('config.php');
+                            require_once('config_secure.php');
                             $select = "SELECT * FROM cake_shop_category";
                             $query = mysqli_query($conn, $select);
                             while ($res = mysqli_fetch_assoc($query)) {
@@ -225,7 +235,21 @@ else {
                 }
             })
         });
+        function showToast(message, type = 'success') {
+            const toast = $('<div class="toast-notification ' + type + '">' + message + '</div>');
+            $('body').append(toast);
+            setTimeout(() => toast.addClass('show'), 100);
+            setTimeout(() => {
+                toast.removeClass('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
         function add_cart(product_id) {
+                // Prevent multiple clicks
+                var btn = event.target;
+                if(btn.disabled) return;
+                btn.disabled = true;
+                
                 $.ajax({
                     url:'fetch_cart.php',
                     data:'id='+product_id,
@@ -234,6 +258,12 @@ else {
                     success:function(cart){
                         console.log(cart);
                         $('.badge').html(cart.length);
+                        showToast('✓ Product added to cart!');
+                        btn.disabled = false;
+                    },
+                    error:function(){
+                        showToast('✗ Error adding to cart', 'error');
+                        btn.disabled = false;
                     }
                 });
             }
